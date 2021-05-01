@@ -30,11 +30,13 @@ func (bst *BinarySearchTree) Insert(in int) {
 				//left
 				if (currentNode.Left == nil) {
 					currentNode.Left = v
+					break
 				}
 				currentNode = currentNode.Left
 			} else {
 				if (currentNode.Right == nil) {
 					currentNode.Right = v
+					break
 				}
 				currentNode = currentNode.Right
 			}
@@ -71,5 +73,9 @@ func TestBinarySearchTree () {
 	bst.Insert(15)
 	bst.Insert(1)
 
+	fmt.Printf("tree length: %v", bst.Length);
 	bst.Lookup(1)
+	bst.Lookup(170)
+	bst.Lookup(15)
+	bst.Lookup(4)
 }
