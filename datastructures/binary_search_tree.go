@@ -1,81 +1,100 @@
 package datastructures
 
-import "fmt"
-
-type BinarySearchTree struct {
-	Root   *BstNode
-	Length int
-}
-
-type BstNode struct {
+type BST struct {
 	Value int
-	Left  *BstNode
-	Right *BstNode
+
+	Left  *BST
+	Right *BST
 }
 
-func (bst *BinarySearchTree) Insert(in int) {
-
-	v := &BstNode{
-		Value: in,
-		Left: nil,
-		Right: nil,
-	}
-
-	if bst.Root == nil {
-		bst.Root = v
-	} else {
-		currentNode := bst.Root
-		for currentNode != nil {
-			if in < currentNode.Value {
-				//left
-				if (currentNode.Left == nil) {
-					currentNode.Left = v
-					break
-				}
-				currentNode = currentNode.Left
-			} else {
-				if (currentNode.Right == nil) {
-					currentNode.Right = v
-					break
-				}
-				currentNode = currentNode.Right
+func (tree *BST) Insert(value int) *BST {
+	currentNode := tree
+	for {
+		if value < currentNode.Value {
+			//left
+			if currentNode.Left == nil {
+				currentNode.Left = &BST{Value: value}
+				break
 			}
+			currentNode = currentNode.Left
+		} else {
+			if currentNode.Right == nil {
+				currentNode.Right = &BST{Value: value}
+				break
+			}
+			currentNode = currentNode.Right
 		}
 	}
-	bst.Length = bst.Length + 1
+	return tree
 }
 
-func (bst *BinarySearchTree) Lookup(in int) {
-	currentNode := bst.Root
-	iter := 0;
+
+func (tree *BST) Contains(value int) bool {
+	currentNode := tree
 	for currentNode != nil {
-		fmt.Printf("\n current node value: %v", currentNode.Value)
-		if currentNode.Value == in {
-			fmt.Printf("\n found value: %v after %v iterations", in, iter)
+		if currentNode.Value == value {
+			return true
 		}
-		if in < currentNode.Value {
+		if value < currentNode.Value {
 			currentNode = currentNode.Left
 		} else {
 			currentNode = currentNode.Right
 		}
-		iter = iter + 1
+	}
+	return false
+}
+
+func (tree *BST) Remove(value int) *BST {
+	tree.remove(value, nil)
+	return tree
+}
+
+func (tree *BST) remove(in int, parent *BST) {
+	current := tree
+	for current != nil {
+		if in < current.Value {
+			parent = current
+			current = current.Left
+		} else if in > current.Value {
+			parent = current
+			current = current.Right
+		} else {
+			if current.Left != nil && current.Right != nil {
+				current.Value = current.Right.getMinValue()
+				current.Right.remove(current.Value, current)
+			} else if parent == nil {
+				if current.Left != nil {
+					current.Value = current.Left.Value
+					current.Right = current.Left.Right
+					current.Left = current.Left.Left
+				} else if current.Right != nil {
+					current.Value = current.Right.Value
+					current.Left = current.Right.Left
+					current.Right = current.Right.Right
+				} else {
+
+				}
+			} else if parent.Left == current {
+				if current.Left != nil {
+					parent.Left = current.Left
+				} else {
+					parent.Left = current.Right
+				}
+			} else if parent.Right == current {
+				if current.Left != nil {
+					parent.Right = current.Left
+				} else {
+					parent.Right = current.Right
+				}
+			}
+			break
+		}
 	}
 }
 
-func TestBinarySearchTree () {
-	var bst BinarySearchTree
-
-	bst.Insert(9)
-	bst.Insert(6)
-	bst.Insert(20)
-	bst.Insert(4)
-	bst.Insert(170)
-	bst.Insert(15)
-	bst.Insert(1)
-
-	fmt.Printf("tree length: %v", bst.Length);
-	bst.Lookup(1)
-	bst.Lookup(170)
-	bst.Lookup(15)
-	bst.Lookup(4)
+func (tree *BST) getMinValue() int {
+	if tree.Left == nil {
+		return tree.Value
+	}
+	return tree.Left.getMinValue()
 }
