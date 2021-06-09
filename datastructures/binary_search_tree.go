@@ -1,5 +1,7 @@
 package datastructures
 
+import "math"
+
 type BST struct {
 	Value int
 
@@ -98,3 +100,57 @@ func (tree *BST) getMinValue() int {
 	}
 	return tree.Left.getMinValue()
 }
+
+func (tree *BST) Validate() bool {
+	return tree.validate(math.MinInt32, math.MaxInt32)
+}
+
+func (tree *BST) validate(min, max int) bool {
+	if tree.Value < min || tree.Value > max {
+		return false
+	}
+	if tree.Left != nil && !tree.Left.validate(min, tree.Value) {
+		return false
+	}
+	if tree.Right != nil && !tree.Right.validate(tree.Value, max) {
+		return false
+	}
+	return true
+}
+
+func (tree *BST) InOrderTraverse(array []int) []int {
+	if tree.Left != nil {
+		array = tree.Left.InOrderTraverse(array)
+	}
+	array = append(array, tree.Value)
+	if tree.Right != nil {
+		array = tree.Right.InOrderTraverse(array)
+	}
+	return array
+}
+
+func (tree *BST) PreOrderTraverse(array []int) []int {
+	array = append(array, tree.Value)
+	if tree.Left != nil {
+		array = tree.Left.PreOrderTraverse(array)
+	}
+	if tree.Right != nil {
+		array = tree.Right.PreOrderTraverse(array)
+	}
+	return array
+}
+
+func (tree *BST) PostOrderTraverse(array []int) []int {
+	if tree.Left != nil {
+		array = tree.Left.PostOrderTraverse(array)
+	}
+	if tree.Right != nil {
+		array = tree.Right.PostOrderTraverse(array)
+	}
+	array = append(array, tree.Value)
+	return array
+}
+
+
+
+
